@@ -6,8 +6,13 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.AsyncTaskLoader;
+import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 
 import java.util.List;
 
@@ -22,10 +28,14 @@ import senac.finance.adapters.FinanceAdapter;
 import senac.finance.models.Finance;
 import senac.finance.models.FinanceDB;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Finance>> {
 
     public static FinanceDB financeDB;
     RecyclerView recyclerView;
+    ProgressBar loading;
+    LoaderManager loaderManager;
+
+    public static final int OPERATION_SEARCH_LOADER = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,17 +48,18 @@ public class MainActivity extends AppCompatActivity {
             financeDB = new FinanceDB(this);
         }
 
+        loaderManager = getSupportLoaderManager();
+
+        loading = findViewById(R.id.loading);
         recyclerView = findViewById(R.id.listFinances);
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this,
                 RecyclerView.VERTICAL, false);
 
         recyclerView.addItemDecoration(
-                new DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL));
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         recyclerView.setLayoutManager(layout);
-
-        recyclerView.setAdapter(new FinanceAdapter(financeDB.select(), this));
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +75,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        recyclerView.setAdapter(new FinanceAdapter(financeDB.select(), this));
+        Loader<List<Finance>> loader = loaderManager.getLoader(OPERATION_SEARCH_LOADER);
+
+        if (loader == null) {
+            loaderManager.initLoader(OPERATION_SEARCH_LOADER, null, MainActivity.this);
+        } else {
+            loaderManager.restartLoader(OPERATION_SEARCH_LOADER, null, MainActivity.this);
+        }
     }
 
     @Override
@@ -87,5 +104,40 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @NonNull
+    @Override
+    public Loader<List<Finance>> onCreateLoader(int id, @Nullable Bundle args) {
+        return new AsyncTaskLoader<List<Finance>>(this) {
+            @Nullable
+            @Override
+            public List<Finance> loadInBackground() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return financeDB.select();
+            }
+
+            @Override
+            protected void onStartLoading() {
+                loading.setVisibility(View.VISIBLE);
+                forceLoad();
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<Finance>> loader, List<Finance> data) {
+        loading.setVisibility(View.GONE);
+
+        recyclerView.setAdapter(new FinanceAdapter(data, this));
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<Finance>> loader) {
+
     }
 }
