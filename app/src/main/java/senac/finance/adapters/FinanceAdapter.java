@@ -63,8 +63,10 @@ public class FinanceAdapter extends RecyclerView.Adapter {
 
         if (finance.getTipo().equals("Receita")){
             viewHolder.valor.setTextColor(Color.GREEN);
+            viewHolder.tipo.setImageResource(R.drawable.img_receita);
         } else {
             viewHolder.valor.setTextColor(Color.RED);
+            viewHolder.tipo.setImageResource(R.drawable.img_despesa);
         }
     }
 
