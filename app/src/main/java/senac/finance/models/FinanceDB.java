@@ -64,7 +64,7 @@ public class FinanceDB extends SQLiteOpenHelper {
         Cursor cursor;
         String[] campos = {"id", "dia", "tipo", "valor"};
         SQLiteDatabase db = this.getReadableDatabase();
-        cursor = db.query("TB_FINANCE", campos, null,null,
+        cursor = db.query("TB_FINANCE", campos, null, null,
                 null, null, null);
 
         List<Finance> finances = new LinkedList<>();
@@ -88,7 +88,7 @@ public class FinanceDB extends SQLiteOpenHelper {
         String[] campos = {"id", "dia", "tipo", "valor"};
         SQLiteDatabase db = this.getReadableDatabase();
         cursor = db.query("TB_FINANCE", campos, "date(dia) = strftime('%d/%m/%Y', ?)",
-                new String[] { data },null, null, null, null);
+                new String[]{data}, null, null, null, null);
 
         List<Finance> finances = new LinkedList<>();
 
@@ -104,5 +104,12 @@ public class FinanceDB extends SQLiteOpenHelper {
         }
         db.close();
         return finances;
+    }
+
+    public void delete(int id) {
+        String where = "id =" + id;
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.delete("TB_FINANCE", where, null);
+        db.close();
     }
 }
