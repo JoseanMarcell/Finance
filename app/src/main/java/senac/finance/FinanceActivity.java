@@ -14,8 +14,11 @@ import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import senac.finance.models.Finance;
 
@@ -24,6 +27,7 @@ public class FinanceActivity extends AppCompatActivity {
     CalendarView dia;
     RadioButton tipo;
     EditText valor;
+    Date diaSelecionado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,19 +40,25 @@ public class FinanceActivity extends AppCompatActivity {
         tipo = findViewById(R.id.rbReceita);
         valor = findViewById(R.id.txtValor);
 
+        dia.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
+                diaSelecionado = new GregorianCalendar(i, i1, i2).getTime();
+            }
+        });
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
-                    Date calend = new Date(dia.getDate());
-                    String diaSelecionado = new SimpleDateFormat("yyyy-MM-dd").format(calend);
+                    String diaFormat = new SimpleDateFormat("yyyy-MM-dd").format(diaSelecionado);
 
                     String tipoSelec = tipo.isChecked() ? "Receita" : "Despesa";
 
                     Double valorSelec = Double.parseDouble(valor.getText().toString());
 
-                    Finance finance = new Finance(0, diaSelecionado, tipoSelec, valorSelec);
+                    Finance finance = new Finance(0, diaFormat, tipoSelec, valorSelec);
 
                     if (MainActivity.financeDB.insert(finance)){
                         finish();
