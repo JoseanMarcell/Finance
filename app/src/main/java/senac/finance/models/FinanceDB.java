@@ -64,8 +64,31 @@ public class FinanceDB extends SQLiteOpenHelper {
         Cursor cursor;
         String[] campos = {"id", "dia", "tipo", "valor"};
         SQLiteDatabase db = this.getReadableDatabase();
-        cursor = db.query("TB_FINANCE", campos, null, null,
-                null, null, null, null);
+        cursor = db.query("TB_FINANCE", campos, null,null,
+                null, null, null);
+
+        List<Finance> finances = new LinkedList<>();
+
+        if (cursor != null) {
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                finances.add(new Finance(
+                        cursor.getInt(cursor.getColumnIndex("id")),
+                        cursor.getString(cursor.getColumnIndex("dia")),
+                        cursor.getString(cursor.getColumnIndex("tipo")),
+                        cursor.getDouble(cursor.getColumnIndex("valor"))
+                ));
+            }
+        }
+        db.close();
+        return finances;
+    }
+
+    public List<Finance> select(String data) {
+        Cursor cursor;
+        String[] campos = {"id", "dia", "tipo", "valor"};
+        SQLiteDatabase db = this.getReadableDatabase();
+        cursor = db.query("TB_FINANCE", campos, "date(dia) = strftime('%d/%m/%Y', ?)",
+                new String[] { data },null, null, null, null);
 
         List<Finance> finances = new LinkedList<>();
 
