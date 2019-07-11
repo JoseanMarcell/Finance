@@ -25,6 +25,7 @@ public class FinanceAdapter extends RecyclerView.Adapter {
 
     private List<Finance> financeList;
     private Context context;
+    private View.OnClickListener mOnItemClickListener;
 
     public FinanceAdapter(List<Finance> financeList, Context context) {
         this.financeList = financeList;
@@ -61,7 +62,7 @@ public class FinanceAdapter extends RecyclerView.Adapter {
         viewHolder.dia.setText(new SimpleDateFormat("dd/MM/yyyy").format(diaSelecionado));
         viewHolder.valor.setText(d.format(finance.getValor()));
 
-        if (finance.getTipo().equals("Receita")){
+        if (finance.getTipo().equals("Receita")) {
             viewHolder.valor.setTextColor(Color.GREEN);
             viewHolder.tipo.setImageResource(R.drawable.img_receita);
         } else {
@@ -70,8 +71,13 @@ public class FinanceAdapter extends RecyclerView.Adapter {
         }
     }
 
+    public void setOnItemClickListener(View.OnClickListener itemClickListener) {
+        mOnItemClickListener = itemClickListener;
+    }
+
     @Override
     public int getItemCount() {
         return financeList.size();
     }
+
 }

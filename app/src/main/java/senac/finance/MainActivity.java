@@ -17,11 +17,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import senac.finance.adapters.FinanceAdapter;
@@ -34,8 +37,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     RecyclerView recyclerView;
     ProgressBar loading;
     LoaderManager loaderManager;
+    static List<Finance> financeList = new ArrayList<>();
 
     public static final int OPERATION_SEARCH_LOADER = 15;
+
+    private View.OnClickListener onItemClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            //TODO: Step 4 of 4: Finally call getTag() on the view.
+            // This viewHolder will have all required values.
+            RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) view.getTag();
+            int position = viewHolder.getAdapterPosition();
+            // viewHolder.getItemId();
+            // viewHolder.getItemViewType();
+            // viewHolder.itemView;
+            Finance thisItem = financeList.get(position);
+            Toast.makeText(MainActivity.this, "You Clicked: " + thisItem.getId(), Toast.LENGTH_SHORT).show();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         loading = findViewById(R.id.loading);
         recyclerView = findViewById(R.id.listFinances);
 
+        /*
         RecyclerView.LayoutManager layout = new LinearLayoutManager(this,
                 RecyclerView.VERTICAL, false);
 
@@ -60,6 +80,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
         recyclerView.setLayoutManager(layout);
+        */
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(
+                new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        recyclerView.setOnClickListener(onItemClickListener);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -113,11 +140,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Nullable
             @Override
             public List<Finance> loadInBackground() {
+
+                if (financeList.size() > 0){
+                    return financeList;
+                }
+
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+
                 return financeDB.select();
             }
 
@@ -133,7 +166,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(@NonNull Loader<List<Finance>> loader, List<Finance> data) {
         loading.setVisibility(View.GONE);
 
-        recyclerView.setAdapter(new FinanceAdapter(data, this));
+        financeList = new ArrayList<>(data);
+
+        recyclerView.setAdapter(new FinanceAdapter(financeList, this));
     }
 
     @Override
