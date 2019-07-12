@@ -10,13 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import senac.finance.R;
 
+import static senac.finance.adapters.FinanceAdapter.mOnItemClickListener;
+
 public class FinanceViewHolder extends RecyclerView.ViewHolder {
 
     final ImageView tipo;
     final TextView dia;
     final TextView valor;
     final ImageButton delete;
-    private View.OnClickListener mOnItemClickListener;
 
     public FinanceViewHolder(@NonNull View itemView) {
         super(itemView);

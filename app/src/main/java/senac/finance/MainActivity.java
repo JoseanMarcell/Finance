@@ -38,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     ProgressBar loading;
     LoaderManager loaderManager;
     static List<Finance> financeList = new ArrayList<>();
+    static Finance financeSelecionado;
+    static boolean alterar = false;
 
     public static final int OPERATION_SEARCH_LOADER = 15;
 
@@ -51,10 +53,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             // viewHolder.getItemId();
             // viewHolder.getItemViewType();
             // viewHolder.itemView;
-            Finance thisItem = financeList.get(position);
-            Toast.makeText(MainActivity.this, "You Clicked: " + thisItem.getId(), Toast.LENGTH_SHORT).show();
+            financeSelecionado = financeList.get(position);
+            Toast.makeText(MainActivity.this, "You Clicked: " + financeSelecionado.getId(), Toast.LENGTH_SHORT).show();
+
+            alterar = true;
+
+            Intent intent = new Intent(getBaseContext(), FinanceActivity.class);
+            startActivity(intent);
         }
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,12 +94,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         recyclerView.addItemDecoration(
                 new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
-        recyclerView.setOnClickListener(onItemClickListener);
-
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                alterar = false;
                 Intent novaFinance = new Intent(getBaseContext(), FinanceActivity.class);
                 startActivity(novaFinance);
             }
@@ -140,11 +147,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Nullable
             @Override
             public List<Finance> loadInBackground() {
-
-                if (financeList.size() > 0){
-                    return financeList;
-                }
-
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -168,7 +170,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         financeList = new ArrayList<>(data);
 
-        recyclerView.setAdapter(new FinanceAdapter(financeList, this));
+        FinanceAdapter adapter = new FinanceAdapter(financeList, this);
+        adapter.setOnItemClickListener(onItemClickListener);
+
+        recyclerView.setAdapter(adapter);
     }
 
     @Override

@@ -40,6 +40,16 @@ public class FinanceActivity extends AppCompatActivity {
         tipo = findViewById(R.id.rbReceita);
         valor = findViewById(R.id.txtValor);
 
+        if (MainActivity.alterar){
+            try {
+                dia.setDate(new SimpleDateFormat("yyyy-MM-dd").parse(MainActivity.financeSelecionado.getDia()).getTime());
+                tipo.setChecked(MainActivity.financeSelecionado.getTipo().equals("Receita"));
+                valor.setText(String.valueOf(MainActivity.financeSelecionado.getValor()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
         dia.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
@@ -58,10 +68,20 @@ public class FinanceActivity extends AppCompatActivity {
 
                     Double valorSelec = Double.parseDouble(valor.getText().toString());
 
-                    Finance finance = new Finance(0, diaFormat, tipoSelec, valorSelec);
+                    if (MainActivity.alterar){
+                        Finance finance = new Finance(MainActivity.financeSelecionado.getId(),
+                                diaFormat, tipoSelec, valorSelec);
 
-                    if (MainActivity.financeDB.insert(finance)){
-                        finish();
+                        if (MainActivity.financeDB.update(finance)){
+                            finish();
+                        }
+                    } else {
+                        Finance finance = new Finance(0,
+                                diaFormat, tipoSelec, valorSelec);
+
+                        if (MainActivity.financeDB.insert(finance)){
+                            finish();
+                        }
                     }
                 } catch (Exception ex){
                     Log.e("FinanceActivity", ex.getMessage());

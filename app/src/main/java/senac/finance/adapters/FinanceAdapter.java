@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +29,7 @@ public class FinanceAdapter extends RecyclerView.Adapter {
 
     private List<Finance> financeList;
     private Context context;
-    private View.OnClickListener mOnItemClickListener;
+    public static View.OnClickListener mOnItemClickListener;
 
     public FinanceAdapter(List<Finance> financeList, Context context) {
         this.financeList = financeList;
@@ -96,6 +97,7 @@ public class FinanceAdapter extends RecyclerView.Adapter {
                         .show();
             }
         });
+
     }
 
     public void setOnItemClickListener(View.OnClickListener itemClickListener) {
