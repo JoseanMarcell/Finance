@@ -27,7 +27,10 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import senac.finance.adapters.FinanceAdapter;
@@ -106,14 +109,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(novaFinance);
             }
         });
-
-        // Get the intent, verify the action and get the query
-        // Pesquisar por datas
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            financeDB.select(query);
-        }
     }
 
     @Override
@@ -179,7 +174,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     e.printStackTrace();
                 }
 
-                return financeDB.select();
+                // Get the intent, verify the action and get the query
+                // Pesquisar por datas
+                Intent intent = getIntent();
+                if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                    String query = intent.getStringExtra(SearchManager.QUERY);
+
+                    List<Finance> q = new ArrayList<>();
+
+                    try {
+                        Date dt = new SimpleDateFormat("dd/MM/yyyy").parse(query);
+
+                        q = financeDB.select(new SimpleDateFormat("yyyy-MM-dd").format(dt));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    return q;
+                } else {
+
+                    return financeDB.select();
+                }
             }
 
             @Override
