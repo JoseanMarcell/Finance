@@ -26,7 +26,7 @@ public class FinanceDB extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         String sql = "CREATE TABLE TB_FINANCE ("
                 + "id integer primary key autoincrement,"
-                + "dia text,"
+                + "dia text," 
                 + "tipo text,"
                 + "valor real"
                 + ")";
