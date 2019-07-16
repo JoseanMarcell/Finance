@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.SearchRecentSuggestions;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
@@ -36,6 +37,7 @@ import java.util.List;
 import senac.finance.adapters.FinanceAdapter;
 import senac.finance.models.Finance;
 import senac.finance.models.FinanceDB;
+import senac.finance.providers.FinanceSuggestionProvider;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<Finance>> {
 
@@ -179,6 +181,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Intent intent = getIntent();
                 if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                     String query = intent.getStringExtra(SearchManager.QUERY);
+
+                    SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getBaseContext(),
+                            FinanceSuggestionProvider.AUTHORITY, FinanceSuggestionProvider.MODE);
+                    suggestions.saveRecentQuery(query, null);
 
                     List<Finance> q = new ArrayList<>();
 
